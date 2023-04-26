@@ -81,13 +81,11 @@ const getDate = (unit) => `${unit < 10 ? `0${unit}` : `${unit}`}`;
 const fullDate = `${getDate(day)}/${getDate(mounth)}/${year}, ${getDate(hour)}:${getDate(minute)}`;
 labelDate.textContent = fullDate;
 
-let summaryValueIn = 0;
-let summaryValueOut = 0;
 
 const displayMovements = function (movements) {
   movements.forEach(function (mov, i) {
     const type = mov > 0 ? "deposit" : "withdrawal";
-    type == "deposit" ? (summaryValueIn += mov) : (summaryValueOut += mov * -1);
+
     const html = `
         <div class="movements__row">
           <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
@@ -97,12 +95,9 @@ const displayMovements = function (movements) {
     `;
     containerMovements.insertAdjacentHTML("afterbegin", html);
 
-    labelSumIn.textContent = `${summaryValueIn}€`;
-    labelSumOut.textContent = `${summaryValueOut}€`;
-    labelBalance.textContent = `${summaryValueIn - summaryValueOut}€`;
+
   });
 };
-
 displayMovements(account1.movements);
 
 
@@ -114,13 +109,89 @@ const createUsernames = function (accs) {
 
 createUsernames(accounts)
 
+const calcPrintBalance = function (movements) {
+  const balance = movements.reduce((acc, mov) => acc + mov, 0)
+  labelBalance.textContent = `${balance}€`;
+}
+calcPrintBalance(account1.movements)
 
+
+const calcDisplaySummary = function (movements) {
+  const incomes = movements.filter(mov => mov > 0).reduce((acc, mov) => acc + mov, 0)
+  const out = Math.abs(movements.filter(mov => mov < 0).reduce((acc, mov) => acc + mov, 0))
+  const interest = movements.filter(mov => mov > 0).map(mov => mov * 1.2 / 100).reduce((acc, mov) => acc + mov, 0)
+
+  labelSumIn.textContent = `${incomes}€`;
+  labelSumOut.textContent = `${out}€`;
+  labelSumInterest.textContent = `${interest}€`
+}
+
+calcDisplaySummary(account1.movements)
+
+
+
+btnLogin.addEventListener("click", function (e) {
+  e.preventDefault()
+  console.log(inputLoginUsername.value, inputLoginPin.value);
+})
 
 /////////////////////////////////////////////////
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300]
 
-const deposits = movements.filter(mov => mov > 0)
-const withdrawal = movements.filter(mov => mov < 0)
-console.log(deposits, withdrawal);
 
+// const deposits = movements.filter(mov => mov > 0)
+// const withdrawal = movements.filter(mov => mov < 0)
+
+// const balance = movements.re duce(function (acc, cur, i) {
+//   console.log(`Iteration ${i}: ${acc}`);
+//   return acc + cur
+// })
+
+
+// const MaxValue = movements.reduce((acc, mov) => {
+//   if (acc < mov) {
+//     acc = mov
+//   }
+//   return acc
+// }, 0)
+// console.log(MaxValue);
+
+// const movements = [200, 450, -400, 3000, -650, -130, 70, 1300]
+// const MaxValue = movements.reduce((acc, mov) => {
+//   if (acc > mov) {
+//     return acc
+//   } else {
+//     return mov
+//   }
+// }, movements[0])
+
+// console.log(MaxValue);
+
+
+
+// Coding Challenge #2
+
+/* 
+Let's go back to Julia and Kate's study about dogs. This time, they want to convert dog ages to human ages and calculate the average age of the dogs in their study.
+
+Create a function 'calcAverageHumanAge', which accepts an arrays of dog's ages ('ages'), and does the following things in order:
+
+1. Calculate the dog age in human years using the following formula: if the dog is <= 2 years old, humanAge = 2 * dogAge. If the dog is > 2 years old, humanAge = 16 + dogAge * 4.
+2. Exclude all dogs that are less than 18 human years old (which is the same as keeping dogs that are at least 18 years old)
+3. Calculate the average human age of all adult dogs (you should already know from other challenges how we calculate averages 😉)
+4. Run the function for both test datasets
+
+TEST DATA 1: [5, 2, 4, 1, 15, 8, 3]
+TEST DATA 2: [16, 6, 10, 5, 6, 1, 4]
+
+GOOD LUCK 😀
+*/
+
+const calcAverageHumanAge = function (ages) {
+  const humanAges = ages.map(age => age <= 2 ? 2 * age : 16 + age * 4)
+  const abult = humanAges.filter(humanAge => humanAge >= 18)
+  const average = abult.reduce((acc, age) => acc + age, 0) / abult.length
+  return average
+}
+
+calcAverageHumanAge([5, 2, 4, 1, 15, 8, 3])
